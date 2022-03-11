@@ -10,7 +10,7 @@ object Versions {
 
 object AppConfig {
     const val compileSdkVersion = 31
-    const val minSdkVersion = 23
+    const val minSdkVersion = 24
     const val buildToolsVersion = "30.0.3"
     const val targetSdkVersion = 31
     const val versionName = "0.1"
