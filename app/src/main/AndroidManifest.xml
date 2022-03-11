@@ -6,6 +6,7 @@
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
+        android:name="com.emmanuelguther.ems.App"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -14,9 +15,8 @@
         android:theme="@style/Theme.EMS"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name="com.emmanuelguther.features.MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.EMS">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

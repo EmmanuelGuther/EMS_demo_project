@@ -22,7 +22,7 @@ sealed class Routes(val path: String) {
 fun AppNavigation() {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = Routes.Splash.path) {
-
+        splashNavRoute(navController)
     }
 }
 
@@ -33,7 +33,7 @@ private fun NavGraphBuilder.splashNavRoute(navController: NavHostController) {
         val viewModel: SplashViewModel = hiltViewModel()
         SplashScreen(
             viewModel,
-            onNavigateToMain ={
+            onNavigateToMain = {
                 navController.navigate(Routes.Main.path)
             }
         )

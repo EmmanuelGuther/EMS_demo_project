@@ -1,3 +1,5 @@
+package com.emmanuelguther.ems
+
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 

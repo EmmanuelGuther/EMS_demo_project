@@ -2,10 +2,10 @@ import Versions.coroutinesVersion
 import org.gradle.api.artifacts.dsl.DependencyHandler
 
 object Versions {
-    const val composeVersion = "1.1.0-beta04"
+    const val composeVersion = "1.1.1"
     const val daggerHiltVersion = "2.40.4"
     const val coroutinesVersion = "1.6.0"
-    const val kotlinVersion = "1.6.0"
+    const val kotlinVersion = "1.6.10"
 }
 
 object AppConfig {

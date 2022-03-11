@@ -32,4 +32,3 @@ dependencies {
     dependenciesCoroutines()
     dependenciesUI()
 }
-
