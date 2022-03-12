@@ -1,4 +1,4 @@
-package com.emmanuelguther.data.datasource
+package com.emmanuelguther.data.datasource.local
 
 class UserLocalDataSource {
     fun getUser(): String = "Federico"

@@ -1,6 +1,6 @@
 package com.emmanuelguther.di
 
-import com.emmanuelguther.data.datasource.UserLocalDataSource
+import com.emmanuelguther.data.datasource.local.UserLocalDataSource
 import com.emmanuelguther.data.repository.UserRepositoryImpl
 import com.emmanuelguther.domain.repository.UserRepository
 import dagger.Module

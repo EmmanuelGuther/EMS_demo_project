@@ -1,6 +1,6 @@
 package com.emmanuelguther.di
 
-import com.emmanuelguther.data.datasource.UserLocalDataSource
+import com.emmanuelguther.data.datasource.local.UserLocalDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
