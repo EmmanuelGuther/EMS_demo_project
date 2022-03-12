@@ -1,4 +1,4 @@
-package com.emmanuelguther.data.network
+package com.emmanuelguther.data.network.util
 
 import com.emmanuelguther.commons.ResultData
 import com.emmanuelguther.data.network.response.ErrorResponse

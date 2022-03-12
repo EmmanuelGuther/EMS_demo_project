@@ -10,7 +10,6 @@ object Versions {
     const val coroutinesVersion = "1.6.0"
     const val kotlinVersion = "1.6.10"
     const val retrofitVersion = "2.9.0"
-   // implementation 'com.squareup.retrofit2:converter-gson:2.2.0'
     const val okhttp3LoggingInterceptor = "4.9.3"
     const val gson = "2.9.0"
 }
