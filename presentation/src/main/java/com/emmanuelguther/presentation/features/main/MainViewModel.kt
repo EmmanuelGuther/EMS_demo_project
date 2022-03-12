@@ -1,6 +1,7 @@
 package com.emmanuelguther.presentation.features.main
 
 import androidx.lifecycle.viewModelScope
+import com.emmanuelguther.commons.ResultData
 import com.emmanuelguther.core_presentation.ui.utils.MViewModel
 import com.emmanuelguther.core_presentation.ui.utils.UiEffect
 import com.emmanuelguther.core_presentation.ui.utils.UiEvent
@@ -17,14 +18,17 @@ class MainViewModel @Inject constructor(private val getHistoricUseCase: GetHisto
     MViewModel<MainViewModel.State, ViewModelGenericError, MainViewModel.Event, MainViewModel.Effect>() {
 
     init {
-        load()
+        loadHistoric()
     }
 
-    fun load() = viewModelScope.launch {
-        when(getHistoricUseCase.invoke()){
-
+    private fun loadHistoric() = viewModelScope.launch {
+        getHistoricUseCase.invoke().collect {
+            when (it) {
+                is ResultData.Failure -> {}
+                is ResultData.Loading -> {}
+                is ResultData.Success -> {}
+            }
         }
-
         // updateState(ViewModelState.Loaded(State()))
     }
 
