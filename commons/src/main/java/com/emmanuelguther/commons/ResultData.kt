@@ -8,7 +8,7 @@ sealed class ResultData<out T> {
     ): ResultData<T>()
 
     data class Failure<out T>(
-        val errorMessage: String?=null, val exception: Exception?= null
+        val errorMessage: String?=null, val exception: Throwable?= null
     ): ResultData<T>()
 }
 
