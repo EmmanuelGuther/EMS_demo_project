@@ -14,4 +14,5 @@ dependencies {
     implementation(project(":commons"))
     dependenciesCoroutines()
     dependenciesHilt()
+    dependenciesNetwork()
 }

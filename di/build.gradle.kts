@@ -11,7 +11,8 @@ android {
 }
 
 dependencies {
-    dependenciesHilt()
     implementation(project(":data"))
     implementation(project(":domain"))
+    dependenciesHilt()
+    dependenciesNetwork()
 }

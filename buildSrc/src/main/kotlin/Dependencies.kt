@@ -1,4 +1,7 @@
 import Versions.coroutinesVersion
+import Versions.gson
+import Versions.okhttp3LoggingInterceptor
+import Versions.retrofitVersion
 import org.gradle.api.artifacts.dsl.DependencyHandler
 
 object Versions {
@@ -6,6 +9,10 @@ object Versions {
     const val daggerHiltVersion = "2.40.4"
     const val coroutinesVersion = "1.6.0"
     const val kotlinVersion = "1.6.10"
+    const val retrofitVersion = "2.9.0"
+   // implementation 'com.squareup.retrofit2:converter-gson:2.2.0'
+    const val okhttp3LoggingInterceptor = "4.9.3"
+    const val gson = "2.9.0"
 }
 
 object AppConfig {
@@ -20,6 +27,13 @@ object AppConfig {
 
 const val dependencyCoreKtx = "androidx.core:core-ktx:1.7.0"
 const val dependencyLifecycleViewModel = "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0"
+
+fun DependencyHandler.dependenciesNetwork() {
+    add("implementation", "com.squareup.retrofit2:retrofit:${retrofitVersion}")
+    add("implementation", "com.squareup.retrofit2:converter-gson:${retrofitVersion}")
+    add("implementation", "com.squareup.okhttp3:logging-interceptor:${okhttp3LoggingInterceptor}")
+    add("implementation", "com.google.code.gson:gson:${gson}")
+}
 
 fun DependencyHandler.dependenciesCoroutines() {
     add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutinesVersion}")
