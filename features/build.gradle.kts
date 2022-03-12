@@ -11,6 +11,11 @@ android {
     buildFeatures {
         compose = true
     }
+    
+    defaultConfig {
+        minSdk = AppConfig.minSdkVersion
+        targetSdk = AppConfig.targetSdkVersion
+    }
 
     composeOptions {
         kotlinCompilerExtensionVersion = Versions.composeVersion
