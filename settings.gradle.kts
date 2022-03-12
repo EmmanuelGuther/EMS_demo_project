@@ -10,7 +10,7 @@ rootProject.name = "EMS"
 include (":app")
 include (":commons")
 include (":data")
-include (":features")
+include (":presentation")
 include (":di")
 include (":domain")
 include (":core_presentation")

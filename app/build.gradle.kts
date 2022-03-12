@@ -46,7 +46,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":features"))
+    implementation(project(":presentation"))
     implementation(project(":core_presentation"))
     implementation(project(":di"))
 
