@@ -10,15 +10,15 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.ViewCompat
 private val DarkColorScheme = darkColors(
     primary = SunFlower,
-    secondary = Pumpkin,
-    secondaryVariant = Teal,
+    secondary = Teal,
+    secondaryVariant = Pumpkin,
     background = WetAsphalt
 )
 
 private val LightColorScheme = lightColors(
     primary = SunFlower,
-    secondary = Pumpkin,
-    secondaryVariant = Teal,
+    secondary = Teal,
+    secondaryVariant = Pumpkin,
     background = WetAsphalt
 
     /* Other default colors to override
