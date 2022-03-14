@@ -1,9 +1,6 @@
 package com.emmanuelguther.presentation.features.main
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -34,10 +31,10 @@ import com.emmanuelguther.features.R
 import com.emmanuelguther.presentation.components.CircularIcon
 import com.emmanuelguther.presentation.components.ErrorAlert
 import com.emmanuelguther.presentation.components.FullScreenLoading
-import com.emmanuelguther.presentation.components.LoadingText
 import com.emmanuelguther.presentation.model.DayEnergyHistoric
 import com.emmanuelguther.presentation.model.DaysEnergyHistoric
 import com.emmanuelguther.presentation.model.HourEnergyHistoric
+import com.emmanuelguther.presentation.model.LiveModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
 
@@ -58,14 +55,13 @@ private fun Content(state: ViewModelState<out MainViewModel.State, ViewModelGene
     Surface(Modifier.fillMaxSize()) {
         when {
             state.loading() -> FullScreenLoading()
-            state is ViewModelState.Loaded -> {
-                RenderContent(state.content)
-            }
-            state is ViewModelState.Error -> {
-                ErrorAlert(state.error.toString(),
-                    stringResource(R.string.retry), action = { viewModel.setEvent(MainViewModel.Event.OnErrorRetry) }
-                )
-            }
+            state is ViewModelState.Loaded -> RenderContent(state.content)
+
+            state is ViewModelState.Error ->
+                ErrorAlert(
+                    state.error.toString(),
+                    stringResource(R.string.retry),
+                    action = { viewModel.setEvent(MainViewModel.Event.OnErrorRetry) })
         }
     }
 }
@@ -85,11 +81,24 @@ private fun Effects(viewModel: MainViewModel, onNavigateToMain: () -> Unit) {
 @ExperimentalCoroutinesApi
 @Composable
 private fun RenderContent(content: MainViewModel.State) {
-    val selectedDayState = remember { mutableStateOf(content.daysEnergyHistoric.first()) }
 
-    Column(Modifier.fillMaxSize()) {
-        DaysTab(content.daysEnergyHistoric) { selectedDayState.value = it }
-        HoursHorizontalList(Modifier, selectedDayState.value.hourEnergyHistoric) { Dashboard(it) }
+    Column(
+        Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+    ) {
+        val selectedDayState = remember { mutableStateOf(content.data.first()) }
+
+            DaysTab(content.data) { selectedDayState.value = it }
+            HoursHorizontalList(Modifier, selectedDayState.value.hourEnergyHistoric) { Dashboard(it) }
+            LiveEnergy(
+                modifier = Modifier
+                    .padding(8.dp, 16.dp)
+                    .clip(boxShapeDefault)
+                    .background(MaterialTheme.colors.secondary.copy(alpha = 0.1f)),
+                stringResource(R.string.live),
+                content.liveEnergy
+            )
     }
 }
 
@@ -198,7 +207,8 @@ private fun HoursHorizontalList(
             }
         }
     }
-    renderDashboard(data[selectedHourState.value])
+
+    renderDashboard( if(data.size < selectedHourState.value ) data[0] else data[selectedHourState.value])
 }
 
 @Composable
@@ -283,6 +293,26 @@ private fun QuasarEnergy(modifier: Modifier, title: String, subtitle: String, va
     }
 }
 
+@Composable
+private fun LiveEnergy(modifier: Modifier, title: String, liveEnergy: LiveModel) {
+    Column(modifier = modifier) {
+        Text(
+            modifier = Modifier
+                .padding(top = 8.dp)
+                .align(Alignment.CenterHorizontally),
+            text = title,
+            style = MaterialTheme.typography.body2.copy(fontWeight = FontWeight.Bold),
+            color = Color.Black
+        )
+        ItemEnergy(title = stringResource(R.string.building_demand), value = liveEnergy.building.toString(), "kwh")
+        ItemEnergy(title = stringResource(R.string.current_energy), value = liveEnergy.currentEnergy.toString(), "kwh")
+        ItemEnergy(title = stringResource(R.string.grid), value = liveEnergy.grid.toString(), "kwh")
+        ItemEnergy(title = stringResource(R.string.quasars), value = liveEnergy.quasars.toString(), "kwh")
+        ItemEnergy(title = stringResource(R.string.solar), value = liveEnergy.solar.toString(), "kwh")
+        ItemEnergy(title = stringResource(R.string.system_soc), value = liveEnergy.system.toString(), "%")
+        ItemEnergy(title = stringResource(R.string.total_energy), value = liveEnergy.totalEnergy.toString(), "kwh")
+    }
+}
 
 @Composable
 private fun ItemEnergy(title: String, value: String, symbol: String = "") {

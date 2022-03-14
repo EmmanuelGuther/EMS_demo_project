@@ -10,4 +10,12 @@
     <string name="from_quasar">From quasar</string>
     <string name="total">Total</string>
     <string name="retry">Retry</string>
+    <string name="live">LIVE</string>
+    <string name="building_demand">Building demand</string>
+    <string name="current_energy">Current Energy</string>
+    <string name="grid">Grid</string>
+    <string name="quasars">Quasars</string>
+    <string name="solar">Solar</string>
+    <string name="system_soc">SystemSoc</string>
+    <string name="total_energy">Total energy</string>
 </resources>

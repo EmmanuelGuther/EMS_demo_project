@@ -2,7 +2,9 @@ package com.emmanuelguther.data.repository
 
 import com.emmanuelguther.commons.ResultData
 import com.emmanuelguther.data.network.datasource.EnergyRemoteDataSource
+import com.emmanuelguther.data.network.response.LiveResponse
 import com.emmanuelguther.domain.entity.HistoricEntity
+import com.emmanuelguther.domain.entity.LiveEntity
 import com.emmanuelguther.domain.repository.EnergyRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,6 +20,12 @@ class EnergyRepositoryImpl @Inject constructor(private val energyRemoteDataSourc
         launch(Dispatchers.IO) {
             trySend(ResultData.Loading())
             trySend(energyRemoteDataSource.getHistoric())
+        }
+        awaitClose { close() }
+    }
+    override suspend fun getLive(): Flow<ResultData<LiveEntity>> = callbackFlow {
+        launch(Dispatchers.IO) {
+            trySend(energyRemoteDataSource.getLive())
         }
         awaitClose { close() }
     }
