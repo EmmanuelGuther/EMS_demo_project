@@ -2,11 +2,10 @@ package com.emmanuelguther.presentation.features.main
 
 import androidx.lifecycle.viewModelScope
 import com.emmanuelguther.commons.ResultData
-import com.emmanuelguther.core_presentation.ui.utils.MViewModel
-import com.emmanuelguther.core_presentation.ui.utils.UiEffect
-import com.emmanuelguther.core_presentation.ui.utils.UiEvent
-import com.emmanuelguther.core_presentation.ui.utils.ViewModelGenericError
+import com.emmanuelguther.core_presentation.ui.utils.*
 import com.emmanuelguther.domain.usecase.GetHistoricUseCase
+import com.emmanuelguther.presentation.mapper.toDaysEnergyHistoric
+import com.emmanuelguther.presentation.model.DaysEnergyHistoric
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -26,12 +25,10 @@ class MainViewModel @Inject constructor(private val getHistoricUseCase: GetHisto
             when (it) {
                 is ResultData.Failure -> {}
                 is ResultData.Loading -> {}
-                is ResultData.Success -> {}
+                is ResultData.Success -> updateState(ViewModelState.Loaded(State(it.data.toDaysEnergyHistoric())))
             }
         }
-        // updateState(ViewModelState.Loaded(State()))
     }
-
 
     override fun handleEvent(event: Event) {
         when (event) {
@@ -41,7 +38,7 @@ class MainViewModel @Inject constructor(private val getHistoricUseCase: GetHisto
         }
     }
 
-    data class State(val foo: String)
+    data class State(val daysEnergyHistoric: DaysEnergyHistoric)
 
     sealed class Event : UiEvent {
         object OnItemPressed : Event()
