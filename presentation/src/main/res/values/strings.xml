@@ -2,4 +2,11 @@
 <resources>
     <string name="welcome">WELCOME</string>
     <string name="continue_">Continue</string>
+    <string name="quasar">Quasar</string>
+    <string name="discharged_quasar">Discharged from the Quasar</string>
+    <string name="charged_quasar">Charged from the Quasar</string>
+    <string name="from_solar">From solar</string>
+    <string name="from_grid">From grid</string>
+    <string name="from_quasar">From quasar</string>
+    <string name="total">Total</string>
 </resources>

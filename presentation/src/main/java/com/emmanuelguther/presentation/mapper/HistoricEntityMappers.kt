@@ -6,6 +6,7 @@ import com.emmanuelguther.presentation.model.DayEnergyHistoric
 import com.emmanuelguther.presentation.model.DaysEnergyHistoric
 import com.emmanuelguther.presentation.model.HourEnergyHistoric
 import com.emmanuelguther.presentation.utils.getDateFromTimestamp
+import com.emmanuelguther.presentation.utils.maxDecimals
 import com.emmanuelguther.presentation.utils.timeStampToDateTruncatedToHours
 
 
@@ -117,7 +118,7 @@ private fun transformToAveragedEnergyValues(
     historicDayHour: MutableList<HistoricItemHelper>,
     groupDayHour: Map<Long, List<HistoricItemEntity>>
 ): List<HistoricItemHelper> {
-    val average: (Double, Long) -> Double = { value, key -> value / (groupDayHour[key]?.count() ?: 0) }
+    val average: (Double, Long) -> Double = { value, key -> (value / (groupDayHour[key]?.count() ?: 0)).maxDecimals(2) }
 
     return historicDayHour.map {
         HistoricItemHelper(
