@@ -1,6 +1,5 @@
 package com.emmanuelguther.presentation.features.main
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -33,6 +32,9 @@ import com.emmanuelguther.core_presentation.ui.utils.ViewModelGenericError
 import com.emmanuelguther.core_presentation.ui.utils.ViewModelState
 import com.emmanuelguther.features.R
 import com.emmanuelguther.presentation.components.CircularIcon
+import com.emmanuelguther.presentation.components.ErrorAlert
+import com.emmanuelguther.presentation.components.FullScreenLoading
+import com.emmanuelguther.presentation.components.LoadingText
 import com.emmanuelguther.presentation.model.DayEnergyHistoric
 import com.emmanuelguther.presentation.model.DaysEnergyHistoric
 import com.emmanuelguther.presentation.model.HourEnergyHistoric
@@ -46,20 +48,24 @@ fun MainScreen(viewModel: MainViewModel, onNavigateToDetail: () -> Unit) {
     LinkViewModelLifecycle(viewModel)
 
     val state by viewModel.state.collectAsState(initial = ViewModelState.initialState)
-    Content(state)
+    Content(state, viewModel)
     Effects(viewModel, onNavigateToDetail)
 }
 
 @ExperimentalCoroutinesApi
 @Composable
-private fun Content(state: ViewModelState<out MainViewModel.State, ViewModelGenericError>) {
+private fun Content(state: ViewModelState<out MainViewModel.State, ViewModelGenericError>, viewModel: MainViewModel) {
     Surface(Modifier.fillMaxSize()) {
         when {
-            state.loading() -> Log.i("LOADING", "LOADING")
+            state.loading() -> FullScreenLoading()
             state is ViewModelState.Loaded -> {
                 RenderContent(state.content)
             }
-            state is ViewModelState.Error -> Log.e("ERROR", "ERROR")
+            state is ViewModelState.Error -> {
+                ErrorAlert(state.error.toString(),
+                    stringResource(R.string.retry), action = { viewModel.setEvent(MainViewModel.Event.OnErrorRetry) }
+                )
+            }
         }
     }
 }
@@ -237,7 +243,7 @@ private fun Dashboard(hourEnergyHistoric: HourEnergyHistoric) {
                     ItemEnergy(stringResource(R.string.from_solar), hourEnergyHistoric.solarPercent.toString(), "%")
                     ItemEnergy(stringResource(R.string.from_grid), hourEnergyHistoric.gridPercent.toString(), "%")
                     ItemEnergy(stringResource(R.string.from_quasar), hourEnergyHistoric.quasarPercent.toString(), "%")
-                    ItemEnergy(stringResource(R.string.total), hourEnergyHistoric.buildingActivePower.toString(),"kwh")
+                    ItemEnergy(stringResource(R.string.total), hourEnergyHistoric.buildingActivePower.toString(), "kwh")
                 }
             }
         }
@@ -280,7 +286,11 @@ private fun QuasarEnergy(modifier: Modifier, title: String, subtitle: String, va
 
 @Composable
 private fun ItemEnergy(title: String, value: String, symbol: String = "") {
-    Row(modifier = Modifier.fillMaxWidth().padding(8.dp),verticalAlignment=Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween
+    ) {
         Text(
             modifier = Modifier
                 .align(Alignment.CenterVertically),

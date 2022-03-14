@@ -108,7 +108,7 @@ sealed class ViewModelState<C, out E> {
 
 sealed class ViewModelGenericError {
     object Connection : ViewModelGenericError()
-    object RoundError : ViewModelGenericError()
+    data class Default(val message: String) : ViewModelGenericError()
 }
 
 abstract class StatelessViewModel<Event : UiEvent, Effect : UiEffect> : ViewModel() {

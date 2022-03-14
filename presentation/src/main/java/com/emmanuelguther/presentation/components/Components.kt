@@ -2,15 +2,14 @@ package com.emmanuelguther.presentation.components
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.CutCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
@@ -18,17 +17,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.emmanuelguther.core_presentation.ui.theme.Teal
-
-@Composable
-fun DSButton(modifier: Modifier = Modifier, text: String, onClick: () -> Unit) {
-    androidx.compose.material.Button(
-        modifier = modifier,
-        onClick = { onClick() },
-        shape = CutCornerShape(10)
-    ) {
-        Text(text = text)
-    }
-}
 
 @Composable
 fun LoadingText(text: String, modifier: Modifier) {
@@ -61,5 +49,41 @@ fun CircularIcon(modifier: Modifier, imageVector: ImageVector, contentDescriptio
         contentDescription = contentDescription,
         tint = Color.White
     )
+}
+
+@Composable
+fun FullScreenLoading(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+
+    ) {
+        CircularProgressIndicator(
+            modifier = Modifier
+                .size(200.dp)
+                .align(Alignment.Center)
+        )
+
+    }
+}
+
+@Composable
+fun ErrorAlert(errorMessage: String, buttonText: String, action: () -> Unit) {
+        val snackBarVisibleState = remember { mutableStateOf(true) }
+      Box(){
+          if (snackBarVisibleState.value) {
+              Snackbar(
+                  action = {
+                      Button(onClick = {
+                          action.invoke()
+                          snackBarVisibleState.value = false
+                      }
+                      ) { Text(buttonText) }
+                  },
+                  modifier = Modifier.padding(8.dp)
+              ) { Text(text = errorMessage) }
+          }
+      }
+
 
 }

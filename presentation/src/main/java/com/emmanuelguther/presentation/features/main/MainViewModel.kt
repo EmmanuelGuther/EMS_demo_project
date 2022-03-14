@@ -23,8 +23,8 @@ class MainViewModel @Inject constructor(private val getHistoricUseCase: GetHisto
     private fun loadHistoric() = viewModelScope.launch {
         getHistoricUseCase.invoke().collect {
             when (it) {
-                is ResultData.Failure -> {}
-                is ResultData.Loading -> {}
+                is ResultData.Failure -> updateState(ViewModelState.Error(ViewModelGenericError.Default(it.errorMessage.toString()))) //here we should parse the types of errors to act in the view accordingly
+                is ResultData.Loading -> updateState(ViewModelState.Loading())
                 is ResultData.Success -> updateState(ViewModelState.Loaded(State(it.data.toDaysEnergyHistoric())))
             }
         }
@@ -35,6 +35,7 @@ class MainViewModel @Inject constructor(private val getHistoricUseCase: GetHisto
             Event.OnItemPressed -> {
                 setEffect { Effect.NavigateToDetail }
             }
+            Event.OnErrorRetry -> loadHistoric()
         }
     }
 
@@ -42,6 +43,7 @@ class MainViewModel @Inject constructor(private val getHistoricUseCase: GetHisto
 
     sealed class Event : UiEvent {
         object OnItemPressed : Event()
+        object OnErrorRetry : Event()
     }
 
     sealed class Effect : UiEffect {

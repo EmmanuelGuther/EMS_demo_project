@@ -44,7 +44,7 @@ class RemoteDataModule {
             .create(EnergyService::class.java)
 
     companion object {
-        private const val TIMEOUT_CALL: Long = 5000
+        private const val TIMEOUT_CALL: Long = 3000
         private const val TIMEOUT_CONNECT: Long = 5000
     }
 }
