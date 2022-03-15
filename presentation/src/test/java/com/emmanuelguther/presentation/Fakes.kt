@@ -17,7 +17,7 @@ class Fakes {
             gridActivePower = 4.5,
             pvActivePower = 0.0,
             quasarsActivePower = 6.5,
-            timestamp = ""
+            timestamp = "2021-09-26T22:01:00+00:00"
         )
 
         val liveData = LiveEntity(
@@ -54,3 +54,8 @@ class Fakes {
 
 
 }
+
+
+
+
+
