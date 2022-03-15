@@ -21,7 +21,9 @@ class MainViewModel @Inject constructor(private val getHistoricUseCase: GetHisto
     MViewModel<MainViewModel.State, ViewModelGenericError, MainViewModel.Event, MainViewModel.Effect>() {
 
     init {
+        //updateState(State(emptyMap<>()))
         loadHistoric()
+        loadLiveData()
     }
 
     private fun loadHistoric() = viewModelScope.launch {
@@ -29,34 +31,55 @@ class MainViewModel @Inject constructor(private val getHistoricUseCase: GetHisto
             when (it) {
                 is ResultData.Failure -> updateState(ViewModelState.Error(ViewModelGenericError.Default(it.errorMessage.toString()))) //here we should parse the types of errors to act in the view accordingly
                 is ResultData.Loading -> updateState(ViewModelState.Loading())
-                is ResultData.Success -> getLiveUseCase.invoke().collect {itLive->
-                    when (itLive) {
-                        is ResultData.Failure -> {}
-                        is ResultData.Loading -> {}
-                        is ResultData.Success -> updateState(
-                            ViewModelState.Loaded(State(it.data.toDaysEnergyHistoric(),itLive.data.domainToPresentation())))
+                is ResultData.Success -> {
+                    val currentState = getCurrentState()
+                    currentState?.add(State.DaysEHistoric(it.data.toDaysEnergyHistoric()))
+                    currentState?.toSet()?.let { itCurrentState ->
+                        updateState(ViewModelState.Loaded(State(itCurrentState)))
                     }
                 }
-
             }
         }
     }
 
     private fun loadLiveData() = viewModelScope.launch {
-
-    }
-
-
-    override fun handleEvent(event: Event) {
-        when (event) {
-           is Event.OnItemPressed -> {
-                setEffect { Effect.NavigateToDetail(event.data) }
+        getLiveUseCase.invoke().collect {
+            when (it) {
+                is ResultData.Failure -> {}
+                is ResultData.Loading -> {}
+                is ResultData.Success -> {
+                    val currentState = getCurrentState()
+                    currentState?.add(State.LiveE(it.data.domainToPresentation()))
+                    currentState?.toSet()?.let { itCurrentState ->
+                        updateState(ViewModelState.Loaded(State(itCurrentState)))
+                    }
+                }
             }
-            Event.OnErrorRetry -> loadHistoric()
         }
     }
 
-        data class State(val data: DaysEnergyHistoric, val liveEnergy: LiveModel)
+    private fun getCurrentState() = when (currentState().content()?.data) {
+        null -> emptySet<Any>().toMutableSet()
+        else -> currentState().content()?.data?.toMutableSet()
+    }
+
+    override fun handleEvent(event: Event) {
+        when (event) {
+            is Event.OnItemPressed -> {
+                setEffect { Effect.NavigateToDetail(event.data) }
+            }
+            Event.OnErrorRetry -> {
+                loadHistoric()
+                loadLiveData()
+            }
+        }
+    }
+
+    data class State(val data: Set<Any>) {
+        data class DaysEHistoric(val data: DaysEnergyHistoric)
+        data class LiveE(val data: LiveModel)
+    }
+
 
     sealed class Event : UiEvent {
         data class OnItemPressed(val data: HourEnergyHistoric) : Event()

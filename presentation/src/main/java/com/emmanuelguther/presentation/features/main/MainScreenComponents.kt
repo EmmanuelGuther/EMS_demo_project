@@ -1,7 +1,11 @@
 package com.emmanuelguther.presentation.features.main
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
@@ -28,6 +32,7 @@ import com.emmanuelguther.core_presentation.ui.utils.LinkViewModelLifecycle
 import com.emmanuelguther.core_presentation.ui.utils.ViewModelGenericError
 import com.emmanuelguther.core_presentation.ui.utils.ViewModelState
 import com.emmanuelguther.features.R
+import com.emmanuelguther.presentation.components.AnimatedText
 import com.emmanuelguther.presentation.components.CircularIcon
 import com.emmanuelguther.presentation.components.ErrorAlert
 import com.emmanuelguther.presentation.components.FullScreenLoading
@@ -55,8 +60,9 @@ private fun Content(state: ViewModelState<out MainViewModel.State, ViewModelGene
     Surface(Modifier.fillMaxSize()) {
         when {
             state.loading() -> FullScreenLoading()
-            state is ViewModelState.Loaded -> RenderContent(state.content,
-                onNavigateToDetail = { viewModel.setEvent(MainViewModel.Event.OnItemPressed(it)) })
+            state is ViewModelState.Loaded -> RenderContent(state.content.data.toList()) {
+                viewModel.setEvent(MainViewModel.Event.OnItemPressed(it))
+            }
 
             state is ViewModelState.Error ->
                 ErrorAlert(
@@ -81,25 +87,35 @@ private fun Effects(viewModel: MainViewModel, onNavigateToDetail: (HourEnergyHis
 
 @ExperimentalCoroutinesApi
 @Composable
-private fun RenderContent(content: MainViewModel.State, onNavigateToDetail: (HourEnergyHistoric) -> Unit) {
-
-    Column(
-        Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-    ) {
-        val selectedDayState = remember { mutableStateOf(content.data.first()) }
-
-        DaysTab(content.data) { selectedDayState.value = it }
-        HoursHorizontalList(Modifier, selectedDayState.value.hourEnergyHistoric) { Dashboard(it, onNavigateToDetail = onNavigateToDetail) }
-        LiveEnergy(
-            modifier = Modifier
-                .padding(8.dp, 16.dp)
-                .clip(boxShapeDefault)
-                .background(MaterialTheme.colors.secondary.copy(alpha = 0.1f)),
-            stringResource(R.string.live),
-            content.liveEnergy
-        )
+private fun RenderContent(content: List<Any>, onNavigateToDetail: (HourEnergyHistoric) -> Unit) {
+    Box {
+        LazyColumn(content = {
+            items(content) { item ->
+                when (item) {
+                    is MainViewModel.State.DaysEHistoric -> {
+                        val selectedDayState = remember { mutableStateOf(item.data.first()) }
+                        DaysTab(item.data) { itSelected -> selectedDayState.value = itSelected }
+                        HoursHorizontalList(Modifier, selectedDayState.value.hourEnergyHistoric) { itHourEnergy ->
+                            Dashboard(itHourEnergy, onNavigateToDetail = onNavigateToDetail)
+                        }
+                    }
+                }
+            }
+            items(content) { item ->
+                when (item) {
+                    is MainViewModel.State.LiveE -> {
+                        LiveEnergy(
+                            modifier = Modifier
+                                .padding(8.dp, 16.dp)
+                                .clip(boxShapeDefault)
+                                .background(MaterialTheme.colors.secondary.copy(alpha = 0.1f)),
+                            stringResource(R.string.live),
+                            item.data
+                        )
+                    }
+                }
+            }
+        })
     }
 }
 
@@ -236,17 +252,14 @@ private fun Dashboard(hourEnergyHistoric: HourEnergyHistoric, onNavigateToDetail
                 """${hourEnergyHistoric.chargedFromQuasar} kwh"""
             )
         }
-
-        Surface(
-            modifier = Modifier
-                .padding(8.dp)
-                .clip(boxShapeDefault)
-                .fillMaxWidth(),
-            elevation = elevationDefault
+        Card(
+            elevation = elevationDefault,
+            shape = boxShapeDefault,
+            modifier = Modifier.padding(8.dp).fillMaxWidth()
         ) {
             Box(
                 modifier = Modifier
-                    .padding(8.dp)
+
                     .background(MaterialTheme.colors.secondaryVariant.copy(alpha = 0.1f))
                     .clip(boxShapeDefault)
                     .clickable { onNavigateToDetail.invoke(hourEnergyHistoric) }
@@ -298,14 +311,10 @@ private fun QuasarEnergy(modifier: Modifier, title: String, subtitle: String, va
 @Composable
 private fun LiveEnergy(modifier: Modifier, title: String, liveEnergy: LiveModel) {
     Column(modifier = modifier) {
-        Text(
-            modifier = Modifier
-                .padding(top = 8.dp)
-                .align(Alignment.CenterHorizontally),
-            text = title,
-            style = MaterialTheme.typography.body2.copy(fontWeight = FontWeight.Bold),
-            color = Color.Black
-        )
+
+        AnimatedText( title,Modifier.padding(top = 8.dp).align(Alignment.CenterHorizontally),700,
+            Color.Black,MaterialTheme.typography.body2.copy(fontWeight = FontWeight.Bold))
+
         ItemEnergy(title = stringResource(R.string.building_demand), value = liveEnergy.building.toString(), "kwh")
         ItemEnergy(title = stringResource(R.string.current_energy), value = liveEnergy.currentEnergy.toString(), "kwh")
         ItemEnergy(title = stringResource(R.string.grid), value = liveEnergy.grid.toString(), "kwh")
@@ -332,9 +341,9 @@ private fun ItemEnergy(title: String, value: String, symbol: String = "") {
         )
         Text(
             modifier = Modifier
-                .clip(shape = boxShapeDefault)
+                .clip(shape = boxShapeDefault).background(Color.White)
                 .align(Alignment.CenterVertically)
-                .border(BorderStroke(2.dp, MaterialTheme.colors.secondary))
+
                 .padding(8.dp),
             text = """$value $symbol""",
             style = MaterialTheme.typography.h5,
