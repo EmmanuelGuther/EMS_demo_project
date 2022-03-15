@@ -18,4 +18,5 @@
     <string name="solar">Solar</string>
     <string name="system_soc">SystemSoc</string>
     <string name="total_energy">Total energy</string>
+    <string name="percent_chart">Percent Chart</string>
 </resources>

@@ -7,10 +7,9 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -22,12 +21,14 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.emmanuelguther.core_presentation.ui.theme.boxShapeDefault
 import com.emmanuelguther.core_presentation.ui.utils.LinkViewModelLifecycle
 import com.emmanuelguther.core_presentation.ui.utils.ViewModelGenericError
 import com.emmanuelguther.core_presentation.ui.utils.ViewModelState
 import com.emmanuelguther.features.R
+import com.emmanuelguther.presentation.components.AnimatedText
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlin.math.min
 
@@ -37,56 +38,93 @@ import kotlin.math.min
 fun DetailScreen(viewModel: DetailViewModel, onBack: () -> Unit) {
     LinkViewModelLifecycle(viewModel)
     val state by viewModel.state.collectAsState(initial = ViewModelState.initialState)
-    Content(state, viewModel)
+    Content(state, onBack)
 }
 
 @ExperimentalCoroutinesApi
 @Composable
-private fun Content(state: ViewModelState<out DetailViewModel.State, ViewModelGenericError>, viewModel: DetailViewModel) {
-    Surface(Modifier.fillMaxSize()) {
-        when {
-            state.loading() -> Log.i("LOADING", "LOADING")
-            state is ViewModelState.Loaded -> {
-                Box(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-                    Column(modifier = Modifier.align(Alignment.Center).padding(8.dp)
-                        .clip(boxShapeDefault)
-                        .background(MaterialTheme.colors.primary.copy(alpha = 0.1f))) {
-                        BarCharts(
+private fun Content(state: ViewModelState<out DetailViewModel.State, ViewModelGenericError>, onBack: () -> Unit) {
+    val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Open))
+
+    Scaffold(
+        scaffoldState = scaffoldState,
+        topBar = {
+            TopAppBar(title = { Text("TopAppBar") },
+                navigationIcon = {
+                    IconButton(onClick = { onBack.invoke() }) {
+                        Icon(Icons.Filled.ArrowBack, "backIcon")
+                    }
+                }, backgroundColor = MaterialTheme.colors.secondary
+            )
+        },
+        content = {
+            Surface(Modifier.fillMaxSize()) {
+                when {
+                    state.loading() -> Log.i("LOADING", "LOADING")
+                    state is ViewModelState.Loaded -> {
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(150.dp)
-                                .padding( 8.dp),
-                            yAxisValues = listOf(state.content.solar, state.content.grid, state.content.quasar)
-                        )
-                        Row(Modifier.fillMaxWidth().padding(4.dp), horizontalArrangement = Arrangement.SpaceBetween){
-                            Text(
+                                .padding(8.dp)
+                        ) {
+                            Column(
                                 modifier = Modifier
-                                    .align(Alignment.CenterVertically),
-                                text = stringResource(R.string.solar),
-                                style = MaterialTheme.typography.body2,
-                                color = Color.Black
-                            )
-                            Text(
-                                modifier = Modifier
-                                    .align(Alignment.CenterVertically),
-                                text = stringResource(R.string.grid),
-                                style = MaterialTheme.typography.body2,
-                                color = Color.Black
-                            )
-                            Text(
-                                modifier = Modifier
-                                    .align(Alignment.CenterVertically),
-                                text = stringResource(R.string.quasar),
-                                style = MaterialTheme.typography.body2,
-                                color = Color.Black
-                            )
+                                    .align(Alignment.TopCenter)
+                                    .padding(8.dp)
+                                    .clip(boxShapeDefault)
+                                    .background(MaterialTheme.colors.primary.copy(alpha = 0.1f))
+                            ) {
+                                AnimatedText(
+                                    stringResource(R.string.percent_chart),
+                                    Modifier
+                                        .padding(top = 8.dp)
+                                        .align(Alignment.CenterHorizontally), 700,
+                                    Color.Black, MaterialTheme.typography.body2.copy(fontWeight = FontWeight.Bold)
+                                )
+                                BarCharts(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(150.dp)
+                                        .padding(8.dp),
+                                    yAxisValues = listOf(state.content.solar, state.content.grid, state.content.quasar)
+                                )
+                                Row(
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(4.dp), horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(
+                                        modifier = Modifier
+                                            .align(Alignment.CenterVertically),
+                                        text = """${stringResource(R.string.solar)} ${state.content.solar} kwh""",
+                                        style = MaterialTheme.typography.body2,
+                                        color = Color.Black
+                                    )
+                                    Text(
+                                        modifier = Modifier
+                                            .align(Alignment.CenterVertically),
+                                        text = """${stringResource(R.string.grid)} ${state.content.grid} kwh""",
+                                        style = MaterialTheme.typography.body2,
+                                        color = Color.Black
+                                    )
+                                    Text(
+                                        modifier = Modifier
+                                            .align(Alignment.CenterVertically),
+                                        text = """${stringResource(R.string.quasar)} ${state.content.quasar} kwh""",
+                                        style = MaterialTheme.typography.body2,
+                                        color = Color.Black
+                                    )
+                                }
+                            }
                         }
                     }
+                    state is ViewModelState.Error -> Log.e("ERROR", "ERROR")
                 }
             }
-            state is ViewModelState.Error -> Log.e("ERROR", "ERROR")
-        }
-    }
+        },
+    )
+
+
 }
 
 
