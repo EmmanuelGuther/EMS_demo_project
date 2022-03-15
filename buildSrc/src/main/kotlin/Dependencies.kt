@@ -34,6 +34,10 @@ fun DependencyHandler.dependenciesNetwork() {
     add("implementation", "com.google.code.gson:gson:${gson}")
 }
 
+fun DependencyHandler.dependenciesGson(){
+    add("implementation", "com.google.code.gson:gson:${gson}")
+}
+
 fun DependencyHandler.dependenciesCoroutines() {
     add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutinesVersion}")
     add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-android:${coroutinesVersion}")

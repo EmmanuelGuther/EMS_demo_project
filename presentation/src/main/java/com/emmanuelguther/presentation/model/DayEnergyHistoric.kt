@@ -1,7 +1,9 @@
 package com.emmanuelguther.presentation.model
 
+import android.os.Parcelable
 import com.emmanuelguther.presentation.utils.isPositive
 import com.emmanuelguther.presentation.utils.maxDecimals
+import kotlinx.android.parcel.Parcelize
 import kotlin.math.abs
 
 typealias DaysEnergyHistoric = List<DayEnergyHistoric>
@@ -10,6 +12,7 @@ data class DayEnergyHistoric(val year: Int, val month: Int, val day: Int, val ho
     val readableDate = "$year/$month/$day"
 }
 
+@Parcelize
 data class HourEnergyHistoric(
     val timestampYMDH: Long,
     val hour: Int,
@@ -17,7 +20,7 @@ data class HourEnergyHistoric(
     val gridActivePower: Double,
     val pvActivePower: Double,
     val quasarsActivePower: Double
-) {
+) : Parcelable {
     val dischargedFromQuasar = if (quasarsActivePower.isPositive() == false) abs(quasarsActivePower) else 0.0
     val chargedFromQuasar = if (quasarsActivePower.isPositive() == true) abs(quasarsActivePower) else 0.0
     val solarPercent = ((pvActivePower / buildingActivePower) * 100).maxDecimals(2)

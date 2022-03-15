@@ -41,7 +41,7 @@ import kotlinx.coroutines.flow.collectLatest
 @ExperimentalCoroutinesApi
 @ExperimentalComposeUiApi
 @Composable
-fun MainScreen(viewModel: MainViewModel, onNavigateToDetail: () -> Unit) {
+fun MainScreen(viewModel: MainViewModel, onNavigateToDetail: (HourEnergyHistoric) -> Unit) {
     LinkViewModelLifecycle(viewModel)
 
     val state by viewModel.state.collectAsState(initial = ViewModelState.initialState)
@@ -55,7 +55,8 @@ private fun Content(state: ViewModelState<out MainViewModel.State, ViewModelGene
     Surface(Modifier.fillMaxSize()) {
         when {
             state.loading() -> FullScreenLoading()
-            state is ViewModelState.Loaded -> RenderContent(state.content)
+            state is ViewModelState.Loaded -> RenderContent(state.content,
+                onNavigateToDetail = { viewModel.setEvent(MainViewModel.Event.OnItemPressed(it)) })
 
             state is ViewModelState.Error ->
                 ErrorAlert(
@@ -68,11 +69,11 @@ private fun Content(state: ViewModelState<out MainViewModel.State, ViewModelGene
 
 @ExperimentalCoroutinesApi
 @Composable
-private fun Effects(viewModel: MainViewModel, onNavigateToMain: () -> Unit) {
+private fun Effects(viewModel: MainViewModel, onNavigateToDetail: (HourEnergyHistoric) -> Unit) {
     LaunchedEffect(key1 = Unit) {
         viewModel.effect.collectLatest { value ->
             when (value) {
-                MainViewModel.Effect.NavigateToDetail -> onNavigateToMain()
+                is MainViewModel.Effect.NavigateToDetail -> onNavigateToDetail(value.data)
             }
         }
     }
@@ -80,7 +81,7 @@ private fun Effects(viewModel: MainViewModel, onNavigateToMain: () -> Unit) {
 
 @ExperimentalCoroutinesApi
 @Composable
-private fun RenderContent(content: MainViewModel.State) {
+private fun RenderContent(content: MainViewModel.State, onNavigateToDetail: (HourEnergyHistoric) -> Unit) {
 
     Column(
         Modifier
@@ -89,16 +90,16 @@ private fun RenderContent(content: MainViewModel.State) {
     ) {
         val selectedDayState = remember { mutableStateOf(content.data.first()) }
 
-            DaysTab(content.data) { selectedDayState.value = it }
-            HoursHorizontalList(Modifier, selectedDayState.value.hourEnergyHistoric) { Dashboard(it) }
-            LiveEnergy(
-                modifier = Modifier
-                    .padding(8.dp, 16.dp)
-                    .clip(boxShapeDefault)
-                    .background(MaterialTheme.colors.secondary.copy(alpha = 0.1f)),
-                stringResource(R.string.live),
-                content.liveEnergy
-            )
+        DaysTab(content.data) { selectedDayState.value = it }
+        HoursHorizontalList(Modifier, selectedDayState.value.hourEnergyHistoric) { Dashboard(it, onNavigateToDetail = onNavigateToDetail) }
+        LiveEnergy(
+            modifier = Modifier
+                .padding(8.dp, 16.dp)
+                .clip(boxShapeDefault)
+                .background(MaterialTheme.colors.secondary.copy(alpha = 0.1f)),
+            stringResource(R.string.live),
+            content.liveEnergy
+        )
     }
 }
 
@@ -208,11 +209,11 @@ private fun HoursHorizontalList(
         }
     }
 
-    renderDashboard( if(data.size < selectedHourState.value ) data[0] else data[selectedHourState.value])
+    renderDashboard(if (data.size < selectedHourState.value) data[0] else data[selectedHourState.value])
 }
 
 @Composable
-private fun Dashboard(hourEnergyHistoric: HourEnergyHistoric) {
+private fun Dashboard(hourEnergyHistoric: HourEnergyHistoric, onNavigateToDetail: (HourEnergyHistoric) -> Unit) {
     Column(Modifier.fillMaxSize()) {
 
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
@@ -248,6 +249,7 @@ private fun Dashboard(hourEnergyHistoric: HourEnergyHistoric) {
                     .padding(8.dp)
                     .background(MaterialTheme.colors.secondaryVariant.copy(alpha = 0.1f))
                     .clip(boxShapeDefault)
+                    .clickable { onNavigateToDetail.invoke(hourEnergyHistoric) }
             ) {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     ItemEnergy(stringResource(R.string.from_solar), hourEnergyHistoric.solarPercent.toString(), "%")

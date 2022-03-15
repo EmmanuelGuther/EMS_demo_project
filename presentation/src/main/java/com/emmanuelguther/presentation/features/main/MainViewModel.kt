@@ -8,6 +8,7 @@ import com.emmanuelguther.domain.usecase.GetLiveUseCase
 import com.emmanuelguther.presentation.mapper.domainToPresentation
 import com.emmanuelguther.presentation.mapper.toDaysEnergyHistoric
 import com.emmanuelguther.presentation.model.DaysEnergyHistoric
+import com.emmanuelguther.presentation.model.HourEnergyHistoric
 import com.emmanuelguther.presentation.model.LiveModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -21,7 +22,6 @@ class MainViewModel @Inject constructor(private val getHistoricUseCase: GetHisto
 
     init {
         loadHistoric()
-        loadLiveData()
     }
 
     private fun loadHistoric() = viewModelScope.launch {
@@ -49,8 +49,8 @@ class MainViewModel @Inject constructor(private val getHistoricUseCase: GetHisto
 
     override fun handleEvent(event: Event) {
         when (event) {
-            Event.OnItemPressed -> {
-                setEffect { Effect.NavigateToDetail }
+           is Event.OnItemPressed -> {
+                setEffect { Effect.NavigateToDetail(event.data) }
             }
             Event.OnErrorRetry -> loadHistoric()
         }
@@ -59,11 +59,11 @@ class MainViewModel @Inject constructor(private val getHistoricUseCase: GetHisto
         data class State(val data: DaysEnergyHistoric, val liveEnergy: LiveModel)
 
     sealed class Event : UiEvent {
-        object OnItemPressed : Event()
+        data class OnItemPressed(val data: HourEnergyHistoric) : Event()
         object OnErrorRetry : Event()
     }
 
     sealed class Effect : UiEffect {
-        object NavigateToDetail : Effect()
+        data class NavigateToDetail(val data: HourEnergyHistoric) : Effect()
     }
 }
